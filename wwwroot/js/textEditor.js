@@ -45,4 +45,4 @@ connection
     })
     .catch(function (error) {
         console.error("Error connecting to SignalR hub:", error);
-    });
+});
