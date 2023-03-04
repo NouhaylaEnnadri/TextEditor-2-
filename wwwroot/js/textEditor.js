@@ -45,4 +45,24 @@ connection
     })
     .catch(function (error) {
         console.error("Error connecting to SignalR hub:", error);
+    });
+$("#save-button").click(function () {
+    var textContent = editor.getValue();
+    var data = { "Content": textContent };
+    $.ajax({
+        url: "/Text/SaveTextContent",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function (result) {
+            if (result.success) {
+                console.log("Text content saved successfully");
+            } else {
+                console.log("Failed to save text content");
+            }
+        },
+        error: function (error) {
+            console.log("Error saving text content: " + error);
+        }
+    });
 });
