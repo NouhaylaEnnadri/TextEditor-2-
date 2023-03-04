@@ -46,23 +46,26 @@ connection
     .catch(function (error) {
         console.error("Error connecting to SignalR hub:", error);
     });
-$("#save-button").click(function () {
-    var textContent = editor.getValue();
+
+document.getElementById("save-button").addEventListener("click", function () {
+    console.log("hey"); 
+    var textContent = quill.root.innerHTML;
     var data = { "Content": textContent };
-    $.ajax({
-        url: "/Text/SaveTextContent",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(data),
-        success: function (result) {
-            if (result.success) {
+    fetch('/Text/SaveTextContent', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(function (response) {
+            if (response.ok) {
                 console.log("Text content saved successfully");
             } else {
                 console.log("Failed to save text content");
             }
-        },
-        error: function (error) {
+        })
+        .catch(function (error) {
             console.log("Error saving text content: " + error);
-        }
-    });
+        });
 });

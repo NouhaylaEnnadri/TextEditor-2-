@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace CollaborationApp.Controllers
