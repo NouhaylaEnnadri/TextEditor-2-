@@ -1,57 +1,54 @@
 ﻿using CollaborationApp.Data;
-using CollaborationApp.Hubs;
 using CollaborationApp.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace CollaborationApp.Controllers
+namespace TextEditor.Controllers
 {
     public class TextController : Controller
     {
-        private readonly TextDbContext dbContext;
+        private readonly TextDbContext _context;
 
-
-        //inject the injecting serive
-        public TextController(TextDbContext dbContext)
+        public TextController(TextDbContext context)
         {
-            this.dbContext = dbContext;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var latestDocument = await _context.Text.OrderByDescending(d => d.LastEdited).FirstOrDefaultAsync();
+            ViewBag.DocumentContent = latestDocument?.Content;
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SaveTextContent([FromBody] Text model)
+        [HttpGet]
+        public async Task<string> GetTextContent()
         {
-            if (ModelState.IsValid)
-            {
-                // Create a new instance of your model class
-                var textContent = new Text
-                {
-                   Id = Guid.NewGuid(),
-                    Content = model.Content // Set the content property to the text editor's content
-                };
-
-                // Add the new instance to the database context
-                dbContext.Text.Add(textContent);
-
-                // Save changes to the database
-                await dbContext.SaveChangesAsync();
-
-                // Return the saved text content as a JSON object
-                return Json(new { success = true, id = textContent.Id });
-            }
-            
-            // If model state is not valid, return an error message
-            return Json(new { success = false, message = "Invalid model state" });
+            var latestDocument = await _context.Text.OrderByDescending(d => d.LastEdited).FirstOrDefaultAsync();
+            return latestDocument?.Content;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveTextContent([FromBody] Text document)
+        {
+            if (document == null)
+            {
+                return BadRequest();
+            }
 
+            var latestDocument = await _context.Text.OrderByDescending(d => d.LastEdited).FirstOrDefaultAsync();
+
+            if (latestDocument == null || document.Content != latestDocument.Content)
+            {
+                document.LastEdited = DateTime.Now;
+                _context.Text.Add(document);
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok();
+        }
     }
 }

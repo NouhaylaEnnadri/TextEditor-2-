@@ -1,4 +1,5 @@
-﻿var quill = new Quill("#documentEditor", {
+﻿// Load the Quill editor
+var quill = new Quill("#documentEditor", {
     modules: {
         toolbar: [
             ["bold", "italic", "underline", "strike"],
@@ -12,16 +13,27 @@
             [{ color: [] }, { background: [] }],
             [{ font: [] }],
             [{ align: [] }],
-            ["clean"]
-        ]
+            ["clean"],
+        ],
     },
-    theme: "snow"
+    theme: "snow",
 });
 
+// Load the latest saved content from the server into the Quill editor
+fetch("/Text/GetTextContent")
+    .then(function (response) {
+        return response.text();
+    })
+    .then(function (data) {
+        quill.root.innerHTML = data;
+    });
+
+// Initialize SignalR hub connection
 var connection = new signalR.HubConnectionBuilder()
     .withUrl("/hubs/texteditor")
     .build();
 
+// Start the SignalR hub connection
 connection
     .start()
     .then(function () {
@@ -31,32 +43,28 @@ connection
             console.log(content);
             quill.updateContents(JSON.parse(content));
         });
+
         // Send updates to the server when the document content changes
         quill.on("text-change", function (delta, oldDelta, source) {
             if (source == "user") {
                 connection.invoke("updateDocument", JSON.stringify(delta));
             }
-            //// Extract the content of the Quill editor
-            //var content = quill.root.innerHTML;
-
-            //// Insert the content into the output element
-            //document.getElementById("output").innerHTML = content;
         });
     })
     .catch(function (error) {
         console.error("Error connecting to SignalR hub:", error);
     });
 
+// Save the document content to the server
 document.getElementById("save-button").addEventListener("click", function () {
-    console.log("hey"); 
     var textContent = quill.root.innerHTML;
     var data = { "Content": textContent };
-    fetch('/Text/SaveTextContent', {
-        method: 'POST',
+    fetch("/Text/SaveTextContent", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
     })
         .then(function (response) {
             if (response.ok) {
