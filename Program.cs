@@ -1,5 +1,7 @@
 using CollaborationApp.Data;
 using CollaborationApp.Hubs;
+using EntitySignal.Extensions;
+using EntitySignal.Hubs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +17,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<TextDbContext>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
+//adding enitty signal
+builder.Services.AddEntitySignal();
 
 var app = builder.Build();
 
@@ -43,4 +47,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 app.MapHub<TextEditorHub>("/hubs/texteditor");
+//app.MapHub<EntitySignalHub>("/entitysignal");
+
+
 app.Run();

@@ -4,6 +4,7 @@ using CollaborationApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CollaborationApp.Migrations
 {
     [DbContext(typeof(TextDbContext))]
-    partial class TextDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230305125310_IdentityTablbesls")]
+    partial class IdentityTablbesls
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

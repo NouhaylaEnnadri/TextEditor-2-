@@ -1,11 +1,15 @@
 ﻿using CollaborationApp.Models.Domain;
+using EntitySignal.Server.EFDbContext.Data;
+using EntitySignal.Services;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CollaborationApp.Data
 {
-    public class TextDbContext : DbContext
+    public class TextDbContext : EntitySignalIdentityDbContext
     {
-        public TextDbContext(DbContextOptions options) : base(options)
+        //will watch for changes and then notify 
+        public TextDbContext(DbContextOptions options  , EntitySignalDataProcess entitySignalDataProcess) : base(options, entitySignalDataProcess)
         {
         }
 

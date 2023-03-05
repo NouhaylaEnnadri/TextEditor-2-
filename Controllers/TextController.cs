@@ -30,7 +30,6 @@ namespace TextEditor.Controllers
             var latestDocument = await _context.Text.OrderByDescending(d => d.LastEdited).FirstOrDefaultAsync();
             return latestDocument?.Content;
         }
-
         [HttpPost]
         public async Task<IActionResult> SaveTextContent([FromBody] Text document)
         {
@@ -46,9 +45,12 @@ namespace TextEditor.Controllers
                 document.LastEdited = DateTime.Now;
                 _context.Text.Add(document);
                 await _context.SaveChangesAsync();
+                return Json(new { success = true });
             }
 
-            return Ok();
+            return Json(new { success = false });
         }
+
+
     }
 }

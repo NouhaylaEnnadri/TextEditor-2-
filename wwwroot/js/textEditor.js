@@ -29,9 +29,12 @@ fetch("/Text/GetTextContent")
     });
 
 // Initialize SignalR hub connection
-var connection = new signalR.HubConnectionBuilder()
+const connection = new signalR.HubConnectionBuilder()
     .withUrl("/hubs/texteditor")
+    .withAutomaticReconnect()
     .build();
+
+
 
 // Start the SignalR hub connection
 connection
@@ -49,31 +52,31 @@ connection
             if (source == "user") {
                 connection.invoke("updateDocument", JSON.stringify(delta));
             }
+
+            // Save the document content to the server after a delay
+            setTimeout(function () {
+                var textContent = quill.root.innerHTML;
+                var data = { "Content": textContent };
+                fetch("/Text/SaveTextContent", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then(function (response) {
+                        if (response.ok) {
+                            console.log("Text content saved successfully");
+                        } else {
+                            console.log("Failed to save text content");
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log("Error saving text content: " + error);
+                    });
+            }, 5000); // Save the document content after 5 seconds of inactivity
         });
     })
     .catch(function (error) {
         console.error("Error connecting to SignalR hub:", error);
     });
-
-// Save the document content to the server
-document.getElementById("save-button").addEventListener("click", function () {
-    var textContent = quill.root.innerHTML;
-    var data = { "Content": textContent };
-    fetch("/Text/SaveTextContent", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then(function (response) {
-            if (response.ok) {
-                console.log("Text content saved successfully");
-            } else {
-                console.log("Failed to save text content");
-            }
-        })
-        .catch(function (error) {
-            console.log("Error saving text content: " + error);
-        });
-});
