@@ -75,7 +75,7 @@ connection
                     .catch(function (error) {
                         console.log("Error saving text content: " + error);
                     });
-            }, 5000); // Save the document content after 5 seconds of inactivity
+            }, 1000); // Save the document content after 5 seconds of inactivity
         });
     })
     .catch(function (error) {
